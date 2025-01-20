@@ -18,6 +18,6 @@ class Profile extends Model
     ];
     public function users()
     {
-        return $this->belongsTo(User::class, 'role_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
