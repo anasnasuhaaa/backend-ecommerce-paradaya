@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\OtpCode;
 use Illuminate\Http\Request;
+use App\Mail\GenerateOtpMail;
+use App\Mail\UserRegisterMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -47,6 +52,7 @@ class AuthController extends Controller
         $user->role_id = $roleUser;
         $user->save();
 
+        Mail::to($user->email)->send(new UserRegisterMail($user));
 
         return response([
             'message' => 'User berhasil register, silakan cek email',
@@ -105,6 +111,47 @@ class AuthController extends Controller
 
         return response([
             'message' => 'Tidak ada yang diperbarui'
+        ], 200);
+    }
+    public function generateOtpCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        $user = User::where('email', $request->input('email'))->first();
+
+        $user->generate_otp();
+
+        Mail::to($user->email)->send(new GenerateOtpMail($user));
+        return response()->json([
+            'message' => 'OTP berhasil dikirim, silakan chek email anda',
+        ], 200);
+    }
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|min:6',
+        ]);
+        $user = auth()->user();
+        $otp_code = OtpCode::where('otp', $request->input('otp'))->first();
+        if (!$otp_code) {
+            return response([
+                'message' => 'OTP code tidak ditemukan'
+            ], 404);
+        }
+        // Check exp OTP If Now > Valid Until
+        $now = Carbon::now();
+        if ($now > $otp_code->valid_until) {
+            return response([
+                "message" => "OTP code sudah tidak berlaku, silakan generate ulang OTP"
+            ], 400);
+        }
+        // Update email virified user
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        $otp_code->delete();
+        return response([
+            "message" => "Verifikasi email berhasil"
         ], 200);
     }
 }

@@ -25,6 +25,8 @@ Route::prefix('v1')->group(function () {
         route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
         route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
         route::post('/update', [AuthController::class, 'update'])->middleware('auth:api');
+        route::post('/generate-otp-code', [App\Http\Controllers\Api\AuthController::class, 'generateOtpCode'])->middleware('auth:api');
+        route::post('/verifikasi-akun', [App\Http\Controllers\Api\AuthController::class, 'verify'])->middleware('auth:api');
     })->middleware('api');
     // Route Tsania
 });
