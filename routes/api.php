@@ -28,5 +28,6 @@ Route::prefix('v1')->group(function () {
         route::post('/generate-otp-code', [App\Http\Controllers\Api\AuthController::class, 'generateOtpCode'])->middleware('auth:api');
         route::post('/verifikasi-akun', [App\Http\Controllers\Api\AuthController::class, 'verify'])->middleware('auth:api');
     })->middleware('api');
+    route::post('/profile', [App\Http\Controllers\Api\ProfileController::class, 'storeupdate'])->middleware(['auth:api', 'isEmailVerified']);
     // Route Tsania
 });
