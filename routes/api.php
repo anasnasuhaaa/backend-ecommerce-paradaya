@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\RoleController;
 
 Route::prefix('v1')->group(function () {
     // Route Anas
-    route::apiResource('role', RoleController::class)->middleware(['auth:api']);
+    route::apiResource('role', RoleController::class)->middleware(['auth:api', 'isAdmin']);
     route::prefix('auth')->group(function () {
         route::post('/login', [AuthController::class, 'login']);
         route::post('/register', [AuthController::class, 'register']);
