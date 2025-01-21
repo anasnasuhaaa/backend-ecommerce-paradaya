@@ -4,6 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\OrderController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +35,7 @@ Route::prefix('v1')->group(function () {
     })->middleware('api');
     route::post('/profile', [App\Http\Controllers\Api\ProfileController::class, 'storeupdate'])->middleware(['auth:api', 'isEmailVerified']);
     // Route Tsania
+    Route::apiResource('category', CategoryController::class);
+    Route::apiResource('products', ProductsController::class);
+    Route::apiResource('orders', OrderController::class);
 });
