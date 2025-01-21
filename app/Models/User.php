@@ -70,4 +70,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(otpCode::class, 'user_id');
     }
+    public function order(){
+        return $this->hasMany(Orders::class, 'user_id');
+    }
 }
