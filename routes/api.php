@@ -6,9 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductsController;
-use App\Http\Controllers\OrderController;
-
-
+use App\Http\Controllers\Api\OrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +18,6 @@ use App\Http\Controllers\OrderController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
 Route::prefix('v1')->group(function () {
     // Route Anas
     route::apiResource('role', RoleController::class)->middleware(['auth:api', 'isAdmin']);
@@ -37,5 +34,5 @@ Route::prefix('v1')->group(function () {
     // Route Tsania
     Route::apiResource('category', CategoryController::class);
     Route::apiResource('products', ProductsController::class);
-    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('orders', OrdersController::class);
 });
