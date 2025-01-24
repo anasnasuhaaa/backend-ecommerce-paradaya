@@ -8,10 +8,10 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware(['isAdmin', 'auth:api'])->except(['index', 'show']);
-    // }
+    public function __construct()
+    {
+        $this->middleware(['isAdmin', 'auth:api'])->except(['index', 'show']);
+    }
 
     /**
      * Display a listing of the resource.
@@ -33,7 +33,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-        ],[
+        ], [
             'required' => "Input :attribute field is required.",
         ]);
 
@@ -45,6 +45,7 @@ class CategoryController extends Controller
 
         return response([
             'message' => "Tambah kategori Berhasil",
+            'data' => $categories
         ], 201);
     }
 
@@ -55,7 +56,7 @@ class CategoryController extends Controller
     {
         $categories = Category::with(['listProducts'])->find($id);
 
-        if (!$categories){
+        if (!$categories) {
             return response([
                 'message' => "Detail Kategori Tidak Ditemukan",
             ], 404);
@@ -74,21 +75,21 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-            
-        ],[
-            'required' => "Input :attribute field is required.",  
+
+        ], [
+            'required' => "Input :attribute field is required.",
         ]);
-        
+
         $categories = Category::find($id);
-        
-        if (!$categories){
+
+        if (!$categories) {
             return response([
                 'message' => "Detail Kategori Tidak Ditemukan",
             ], 404);
         }
 
         $categories->name = $request->input('name');
-        
+
         $categories->save();
 
         return response([
@@ -103,12 +104,12 @@ class CategoryController extends Controller
     {
         $categories = Category::find($id);
 
-        if (!$categories){
+        if (!$categories) {
             return response([
                 'message' => "Kategori Tidak Ditemukan",
             ], 404);
-    }
-    
+        }
+
         $categories->delete();
 
         return response([

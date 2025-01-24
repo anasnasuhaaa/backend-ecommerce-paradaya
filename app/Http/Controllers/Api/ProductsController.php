@@ -8,12 +8,16 @@ use App\Models\Products;
 
 class ProductsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['isAdmin', 'auth:api'])->except(['index', 'show']);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $products = Products::get();
+        $products = Products::with('category')->get();
 
         return response([
             'message' => 'Tampil Produk Berhasil',
@@ -33,19 +37,19 @@ class ProductsController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5000',
             'stock' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
-        ],[
+        ], [
             'required' => "Input :attribute field is required.",
             'mimes' => "Input :attribute field is have to be jpeg, png, jpg, gif.",
             'max' => "Input :attribute field is have to max of 5000",
-            'image' => "Input :attribute field is have to be image",   
-            'exists' => "Input :attribute is not found in categories table",   
+            'image' => "Input :attribute field is have to be image",
+            'exists' => "Input :attribute is not found in categories table",
         ]);
 
         $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath(), [
-            'folder' => 'image',
+            'folder' => 'images',
         ])->getSecurePath();
 
-        $products = New Products;
+        $products = new Products;
 
         $products->name = $request->input('name');
         $products->price = $request->input('price');
@@ -58,8 +62,8 @@ class ProductsController extends Controller
 
         return response([
             'message' => "Tambah Produk Berhasil",
+            'data' => $products
         ], 201);
-
     }
 
     /**
@@ -67,9 +71,9 @@ class ProductsController extends Controller
      */
     public function show(string $id)
     {
-        $products = Products::with(['categories'])->find($id);
+        $products = Products::with(['category'])->find($id);
 
-        if (!$products){
+        if (!$products) {
             return response([
                 'message' => "Detail Produk Tidak Ditemukan",
             ], 404);
@@ -90,31 +94,30 @@ class ProductsController extends Controller
             'name' => 'required|max:255',
             'price' => 'required|integer',
             'description' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5000',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:5000',
             'stock' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
-        ],[
+        ], [
             'required' => "Input :attribute field is required.",
             'mimes' => "Input :attribute field is have to be jpeg, png, jpg, gif.",
             'max' => "Input :attribute field is have to max of 5000",
-            'image' => "Input :attribute field is have to be image",   
-            'exists' => "Input :attribute is not found in categories table",   
+            'image' => "Input :attribute field is have to be image",
+            'exists' => "Input :attribute is not found in categories table",
         ]);
 
         $products = Products::find($id);
 
-
-        if($request->hasFile('image')) {
-            $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath(), [
-                'folder' => 'image',
-            ])->getSecurePath();
-            $products->image = $uploadedFileUrl;
-        }
-
-        if (!$products){
+        if (!$products) {
             return response([
                 'message' => "Detail Produk Tidak Ditemukan",
             ], 404);
+        }
+
+        if ($request->hasFile('image')) {
+            $uploadedFileUrl = cloudinary()->upload($request->file('image')->getRealPath(), [
+                'folder' => 'images',
+            ])->getSecurePath();
+            $products->image = $uploadedFileUrl;
         }
 
         $products->name = $request->input('name');
@@ -127,6 +130,7 @@ class ProductsController extends Controller
 
         return response([
             'message' => "Update Produk Berhasil",
+            'data' => $products
         ], 201);
     }
 
@@ -137,7 +141,7 @@ class ProductsController extends Controller
     {
         $products = Products::find($id);
 
-        if (!$products){
+        if (!$products) {
             return response([
                 'message' => "Detail Produk Tidak Ditemukan",
             ], 404);
